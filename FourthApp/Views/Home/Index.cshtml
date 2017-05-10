@@ -1,0 +1,87 @@
+﻿@using FourthApp.Models
+@model User
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Index</title>
+    <link type="text/css" rel="stylesheet" href="~/content/materialize/css/materialize.min.css" media="screen,projection"/>
+    <script src="~/Scripts/jquery-2.1.1.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <script type="text/javascript" src="~/Scripts/materialize/materialize.min.js"></script>
+    <script src="~/Scripts/mustache.js"></script>
+</head>
+<body >
+
+<nav>
+    <div class="nav-wrapper">
+        <a href="#" class="brand-logo">FourthApp</a>
+    </div>
+</nav>
+<div class="container">
+    <br/>
+    <h3>Pobieranie asynchroniczne metoda GET</h3>
+    <div class="row">
+        @Ajax.ActionLink("Pobierz czas asynchronicznie", "GetTime", null, new AjaxOptions {
+            UpdateTargetId = "target",
+            HttpMethod = "GET",
+            LoadingElementId = "loading",
+            InsertionMode = InsertionMode.Replace
+        }, new { @class = "waves-effect waves-light btn" })
+        @Html.ActionLink("Pobierz czas synchronicznie", "GetTime", "Home", null, new { @class = "waves-effect waves-light btn" })
+    </div>
+
+    <div id="target"></div>
+    <div id="loading" style="display: none">
+        Trwa pobieranie danych...
+    </div><br/>
+
+    <div class="row">
+        <h3>Pobieranie asynchroniczne metoda POST</h3>
+        <div class="col s6">
+            <h4>Wysyłanie synchroniczne</h4>
+            @using (Html.BeginForm("index", "Home")) {
+                @Html.EditorFor(m => m)
+                <input type="submit" value="Wyslij synchronicznie" class="waves-effect waves-light btn"/>
+            }
+        </div>
+
+        <div class="col s6">
+            <h4>Wysyłanie asynchroniczne</h4>
+            @using (Ajax.BeginForm(new AjaxOptions{
+                HttpMethod = "POST",
+                OnSuccess = "Update"
+            })) {
+                @Html.EditorFor(m => m)
+                <input type="submit" value="Wyslij asynchronicznie" class="waves-effect waves-light btn"/>
+            }
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col s6 offset-s6">
+            <div id="formResult"></div>
+        </div>
+    </div>
+    
+</div>
+</body>
+</html>
+<script id="userTemplate" type="tesxt/template">
+    <p>Imie: {{FirstName}}</p>
+    <p>Nazwisko: {{LastName}}</p>
+    <p> Wiek: {{Age}}</p>
+</script>
+
+<script>
+    function Update(result) {
+        var template = $('#userTemplate').html();
+        var html = Mustache.to_html(template, result);
+        $('#formResult').html(html);
+    }
+</script>
